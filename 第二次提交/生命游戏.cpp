@@ -1,45 +1,54 @@
 #include "stdio.h"
 #include "string.h"
 #include "windows.h"
+#include "time.h"
  
-#define N 49//1±íÊ¾Æå×Ó£¬Ö»ÓĞºÚÉ«Æå×Ó
+#define N 49//1è¡¨ç¤ºæ£‹å­ï¼Œåªæœ‰é»‘è‰²æ£‹å­
  
-int chess[N+2][N+2];//¶¨ÒåÆåÅÌ´óĞ¡
-int chess0[N+2][N+2];//¸¨ÖúÆåÅÌ
+int chess[N+2][N+2];//å®šä¹‰æ£‹ç›˜å¤§å°
+int chess0[N+2][N+2];//è¾…åŠ©æ£‹ç›˜
  
  
-void Initialize();//³õÊ¼»¯Ò»¸ö¶Ô¾Öº¯Êı
-void RunGame();//½øĞĞÓÎÏ·
-int Count(int i,int j);//¼ÆËãÉúÃüÖÜÎ§µÄÉúÃüÊıÁ¿
-void Data();//µ÷ÓÃÒÑ´æµÄÓÎÏ·Êı¾İ
+void Initialize();//åˆå§‹åŒ–ä¸€ä¸ªå¯¹å±€å‡½æ•°
+void RunGame();//è¿›è¡Œæ¸¸æˆ
+int count_cellsNumber(int i,int j);//è®¡ç®—ç”Ÿå‘½å‘¨å›´çš„ç”Ÿå‘½æ•°é‡
+void Data();//è°ƒç”¨å·²å­˜çš„æ¸¸æˆæ•°æ®
  
-main()
+void main()
 {
-    system("mode con cols=99 lines=50");//ÉèÖÃ´°¿Ú´óĞ¡
-    system("color 70");//ÉèÖÃÑÕÉ«
-    Initialize();//³õÊ¼»¯Ò»¸ö¶Ô¾Öº¯Êı
-    RunGame();//½øĞĞÓÎÏ·
+    system("mode con cols=99 lines=50");//è®¾ç½®çª—å£å¤§å°
+    system("color 70");//è®¾ç½®é¢œè‰²
+    Initialize();//åˆå§‹åŒ–ä¸€ä¸ªå¯¹å±€å‡½æ•°
+    RunGame();//è¿›è¡Œæ¸¸æˆ
 }
  
-void Initialize()//³õÊ¼»¯Ò»¸ö¶Ô¾Öº¯Êı
+void Initialize()//åˆå§‹åŒ–ä¸€ä¸ªå¯¹å±€å‡½æ•°
 {
-    Data();//µ÷ÓÃÒÑ´æµÄÓÎÏ·Êı¾İ
+    Data();//è°ƒç”¨å·²å­˜çš„æ¸¸æˆæ•°æ®
 }
  
-void Data()//µ÷ÓÃÒÑ´æµÄÓÎÏ·Êı¾İ
+void Data()//è°ƒç”¨å·²å­˜çš„æ¸¸æˆæ•°æ®
 {
+	int i,j;
+	srand((unsigned)time(NULL));
+	for(i=0;i<N;i++){
+		for(j=0;j<N;j++)
+			chess[i][j]=rand()%2;
+	}
+	/*
     int p=12;
     int l;
     for(l=-16;l<=16;l++)
         //if(l!=-8&&l!=0&&l!=4)
         chess[N/2+1][N/2+1+l]=1;
+		*/
  
 /*
-//»¬Ïè»ú
+//æ»‘ç¿”æœº
 chess[1][3]=1;chess[2][1]=1;chess[2][3]=1;chess[3][2]=1;chess[3][3]=1;
 */
 /*
-//¸ßË¹ÅÁ»¬Ïè»ú
+//é«˜æ–¯å¸•æ»‘ç¿”æœº
 chess[1][p+11]=1;chess[1][p+13]=1;
 chess[2][p+10]=1;chess[2][p+13]=1;
 chess[3][p+9]=1;chess[3][p+10]=1;chess[3][p+21]=1;chess[3][p+28]=1;
@@ -52,18 +61,36 @@ chess[9][p+17]=1;chess[9][p+18]=1;chess[9][p+28]=1;
 */
 }
  
-void RunGame()//½øĞĞÓÎÏ·
+void cells_state(int i,int j)
+{
+	int living_cellsnumber=0;
+	living_cellsnumber=count_cellsNumber(i,j);
+	if(chess[i][j]==1){
+		if(living_cellsnumber<2)
+			chess0[i][j]=0;//å¦‚æœä¸€ä¸ªç”Ÿå‘½å‘¨å›´çš„ç”Ÿå‘½å°‘äº2ä¸ªï¼Œå®ƒåœ¨å›åˆç»“æŸåæ­»äº¡ã€‚
+		else if(living_cellsnumber>3)
+			chess0[i][j]=0;//å¦‚æœä¸€ä¸ªç”Ÿå‘½å‘¨å›´çš„ç”Ÿå‘½è¶…è¿‡3ä¸ªï¼Œå®ƒåœ¨å›åˆç»“æŸåæ­»äº¡ã€‚
+		else if(living_cellsnumber==2||living_cellsnumber==3)
+			chess0[i][j]=1;//å¦‚æœä¸€ä¸ªç”Ÿå‘½å‘¨å›´æœ‰2æˆ–3ä¸ªç”Ÿå‘½ï¼Œå®ƒåœ¨å›åˆç»“æŸæ—¶ä¿æŒåŸæ ·ã€‚
+	}
+	else if(chess[i][j]==0){
+		if(living_cellsnumber==3)
+			chess0[i][j]=1;//å¦‚æœä¸€ä¸ªæ­»æ ¼å‘¨å›´æœ‰3ä¸ªç”Ÿå‘½ï¼Œå®ƒåœ¨å›åˆç»“æŸæ—¶è·å¾—ç”Ÿå‘½ã€‚
+	}
+}
+
+void RunGame()//è¿›è¡Œæ¸¸æˆ
 {
     int i,j,s=0;
     int flag=0;
     while(1)
     {
-        system("cls");//ÇåÀíÆÁÄ»£¬×¼±¸Ğ´Èë
+        system("cls");//æ¸…ç†å±å¹•ï¼Œå‡†å¤‡å†™å…¥
         for(i=1;i<N+1;i++)
         {
             for(j=1;j<N+1;j++)
                 if(chess[i][j]==1)
-                    printf("¨€");//printf("¡ö");
+                    printf("â–ˆ");//printf("â– ");
                 else if(chess[i][j]==0)
                     printf("  ");
             printf("\n");
@@ -71,26 +98,12 @@ void RunGame()//½øĞĞÓÎÏ·
         for(i=1;i<N+1;i++)
             for(j=1;j<N+1;j++)
             {
-                s=Count(i,j);
-                if(chess[i][j]==1)
-                {
-                    if(s<2)
-                        chess0[i][j]=0;//Èç¹ûÒ»¸öÉúÃüÖÜÎ§µÄÉúÃüÉÙÓÚ2¸ö£¬ËüÔÚ»ØºÏ½áÊøºóËÀÍö¡£
-                    else if(s>3)
-                        chess0[i][j]=0;//Èç¹ûÒ»¸öÉúÃüÖÜÎ§µÄÉúÃü³¬¹ı3¸ö£¬ËüÔÚ»ØºÏ½áÊøºóËÀÍö¡£
-                    else if(s==2||s==3)
-                        chess0[i][j]=1;//Èç¹ûÒ»¸öÉúÃüÖÜÎ§ÓĞ2»ò3¸öÉúÃü£¬ËüÔÚ»ØºÏ½áÊøÊ±±£³ÖÔ­Ñù¡£
-                }
-                else if(chess[i][j]==0)
-                {
-                    if(s==3)
-                        chess0[i][j]=1;//Èç¹ûÒ»¸öËÀ¸ñÖÜÎ§ÓĞ3¸öÉúÃü£¬ËüÔÚ»ØºÏ½áÊøÊ±»ñµÃÉúÃü¡£
-                }
+				cells_state(i,j);
             }
          for(i=1;i<N+1;i++)
             for(j=1;j<N+1;j++)
                 chess[i][j]=chess0[i][j];
-        Sleep(5);
+        Sleep(10);
         if(flag==0)
         {
             getchar();
@@ -99,12 +112,13 @@ void RunGame()//½øĞĞÓÎÏ·
     }
 }
  
-int Count(int i,int j)//¼ÆËãÉúÃüÖÜÎ§µÄÉúÃüÊıÁ¿
+int count_cellsNumber(int xline,int yline)//è®¡ç®—ç”Ÿå‘½å‘¨å›´çš„ç”Ÿå‘½æ•°é‡
 {
-    int s=0,a,b;
-    for(a=-1;a<=1;a++)
-        for(b=-1;b<=1;b++)
-            if(!(a==0&&b==0)&&chess[i+a][j+b]==1)
-                s++;
-    return s;
+    int living_cellsnumber=0,i,j;
+    for(i=-1;i<=1;i++){
+        for(j=-1;j<=1;j++){
+            if(!(i==0&&j==0)&&chess[xline+i][yline+j]==1)
+                living_cellsnumber++;
+        }
+    }return living_cellsnumber;
 }
